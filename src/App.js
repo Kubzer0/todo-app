@@ -2,7 +2,7 @@ import React from 'react'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 
-
+const API_URL = 'https://poniedzialek-5c108.firebaseio.com'
 
 const style = {
   margin: 12,
@@ -11,30 +11,41 @@ const style = {
 class App extends React.Component {
 
   state = {
-    tasks: [
-      {
-        taskName: 'odkurzanie',
-        completed: false
-      },
-      {
-        taskName: 'zmywanie',
-        completed: false
-      }
-    ],
+    tasks: [],
     taskName: ""
   }
 
   handleClick = (event) => {
     if (this.state.taskName !== '') {
       let tasks = this.state.tasks
-      tasks.push({ taskName: this.state.taskName, completed: false })
-      this.setState({ tasks: tasks, taskName: "" })
+      const newTask = ({ taskName: this.state.taskName, completed: false })
+      tasks.push(newTask)
+      fetch(`${API_URL}/tasks.json`, {
+        method: 'POST',
+        body: JSON.stringify(newTask)
+      })
+        .then(() => this.setState({ tasks: tasks, taskName: "" }))
     }
+
   }
 
   handleChange = (event) => {
     this.setState({ taskName: event.target.value })
   }
+
+
+componentWillMount(){
+  fetch(`${API_URL}/tasks.json`)
+  .then(response=> response.json())
+  .then(data=> {
+    const array= Object.entries(data)
+    const taskList = array.map(([id, value])=>{
+      value.id =id
+      return value
+    })
+    this.setState({tasks: taskList})
+  })
+}
 
   render() {
     return (
@@ -54,7 +65,9 @@ class App extends React.Component {
         <div>
           {this.state.tasks.map((task, index) =>
             (
-              <div>
+              <div
+              key ={task.id}
+              >
                 {task.taskName}
               </div>
             ))}
