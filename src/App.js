@@ -103,7 +103,7 @@ class App extends React.Component {
                 key={task.id}
                 primaryText={task.taskName}
                 leftCheckbox={<Checkbox
-                  defaultCheck={task.completed}
+                  defaultChecked={task.completed}
                   onCheck={() => this.handleCheck(task)} />}
                 rightIconButton={
                   <IconButton>
