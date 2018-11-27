@@ -45,20 +45,28 @@ class App extends React.Component {
     if (event.keyCode === 13) { this.addTask() }
   }
 
-  handleDelete =(id) =>{
+  handleDelete = (id) => {
     fetch(`${API_URL}/tasks/${id}.json`, {
       method: 'DELETE'
     })
-    .then(()=> this.loadData())
+      .then(() => this.loadData())
   }
 
-  loadData= ()=>{
+  handleCheck = (task) => {
+    task.completed = !task.completed
+    fetch(`${API_URL}/tasks/${task.id}.json`, {
+      method: 'PUT',
+      body: JSON.stringify(task)
+    })
+  }
+
+  loadData = () => {
     fetch(`${API_URL}/tasks.json`)
       .then(response => response.json())
       .then(data => {
         if (!data) {
           this.setState({ tasks: [] })
-          return 
+          return
         }
         const array = Object.entries(data)
         const taskList = array.map(([id, value]) => {
@@ -94,7 +102,9 @@ class App extends React.Component {
               <ListItem
                 key={task.id}
                 primaryText={task.taskName}
-                leftCheckbox={<Checkbox />}
+                leftCheckbox={<Checkbox
+                  defaultCheck={task.completed}
+                  onCheck={() => this.handleCheck(task)} />}
                 rightIconButton={
                   <IconButton>
                     <DeleteIcon onClick={() => this.handleDelete(task.id)} />
