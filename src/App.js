@@ -19,14 +19,17 @@ class App extends React.Component {
     if (this.state.taskName !== '') {
       let tasks = this.state.tasks
       const newTask = ({ taskName: this.state.taskName, completed: false })
-      tasks.push(newTask)
       fetch(`${API_URL}/tasks.json`, {
         method: 'POST',
         body: JSON.stringify(newTask)
       })
-        .then(() => this.setState({ tasks: tasks, taskName: "" }))
+        .then(response => response.json())
+        .then((data) => {
+          newTask.id = data.name
+          tasks.push(newTask)
+          this.setState({ tasks: tasks, taskName: "" })
+        })
     }
-
   }
 
   handleChange = (event) => {
@@ -34,18 +37,18 @@ class App extends React.Component {
   }
 
 
-componentWillMount(){
-  fetch(`${API_URL}/tasks.json`)
-  .then(response=> response.json())
-  .then(data=> {
-    const array= Object.entries(data)
-    const taskList = array.map(([id, value])=>{
-      value.id =id
-      return value
-    })
-    this.setState({tasks: taskList})
-  })
-}
+  componentWillMount() {
+    fetch(`${API_URL}/tasks.json`)
+      .then(response => response.json())
+      .then(data => {
+        const array = Object.entries(data)
+        const taskList = array.map(([id, value]) => {
+          value.id = id
+          return value
+        })
+        this.setState({ tasks: taskList })
+      })
+  }
 
   render() {
     return (
@@ -66,7 +69,7 @@ componentWillMount(){
           {this.state.tasks.map((task, index) =>
             (
               <div
-              key ={task.id}
+                key={task.id}
               >
                 {task.taskName}
               </div>
