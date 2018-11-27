@@ -56,7 +56,8 @@ class App extends React.Component {
       .then(response => response.json())
       .then(data => {
         if (!data) {
-          return
+          this.setState({ tasks: [] })
+          return 
         }
         const array = Object.entries(data)
         const taskList = array.map(([id, value]) => {
