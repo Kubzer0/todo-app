@@ -15,21 +15,25 @@ class App extends React.Component {
     taskName: ""
   }
 
-  handleClick = (event) => {
-    if (this.state.taskName !== '') {
-      let tasks = this.state.tasks
-      const newTask = ({ taskName: this.state.taskName, completed: false })
-      fetch(`${API_URL}/tasks.json`, {
-        method: 'POST',
-        body: JSON.stringify(newTask)
+addTask=()=>{
+  if (this.state.taskName !== '') {
+    let tasks = this.state.tasks
+    const newTask = ({ taskName: this.state.taskName, completed: false })
+    fetch(`${API_URL}/tasks.json`, {
+      method: 'POST',
+      body: JSON.stringify(newTask)
+    })
+      .then(response => response.json())
+      .then((data) => {
+        newTask.id = data.name
+        tasks.push(newTask)
+        this.setState({ tasks: tasks, taskName: "" })
       })
-        .then(response => response.json())
-        .then((data) => {
-          newTask.id = data.name
-          tasks.push(newTask)
-          this.setState({ tasks: tasks, taskName: "" })
-        })
-    }
+  }
+}
+
+  handleClick = (event) => {
+  this.addTask()
   }
 
   handleChange = (event) => {
@@ -38,13 +42,16 @@ class App extends React.Component {
 
   handleKeyDown = (event) => {
     if (event.keyCode === 13)
-    {this.handleClick()}
+    {this.addTask()}
   }
 
   componentWillMount() {
     fetch(`${API_URL}/tasks.json`)
       .then(response => response.json())
       .then(data => {
+        if (!data){
+          return
+        }
         const array = Object.entries(data)
         const taskList = array.map(([id, value]) => {
           value.id = id
