@@ -36,6 +36,10 @@ class App extends React.Component {
     this.setState({ taskName: event.target.value })
   }
 
+  handleKeyDown = (event) => {
+    if (event.keyCode === 13)
+    {this.handleClick()}
+  }
 
   componentWillMount() {
     fetch(`${API_URL}/tasks.json`)
@@ -57,6 +61,7 @@ class App extends React.Component {
           hintText="Add Task"
           value={this.state.taskName}
           onChange={this.handleChange}
+          onKeyDown={this.handleKeyDown}
         >
         </TextField>
         <RaisedButton
